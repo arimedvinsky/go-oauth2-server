@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/RichardKnop/go-oauth2-server/models"
+	"fmt"
 )
 
 var (
@@ -19,11 +20,13 @@ func (s *Service) GrantAuthorizationCode(client *models.OauthClient, user *model
 	// Create a new authorization code
 	authorizationCode := models.NewOauthAuthorizationCode(client, user, expiresIn, redirectURI, scope)
 	if err := s.db.Create(authorizationCode).Error; err != nil {
+		fmt.Printf("=============== Failed to insert authz code %+v\n", err)
 		return nil, err
 	}
 	authorizationCode.Client = client
 	authorizationCode.User = user
 
+	fmt.Printf("####### Authorization code issued %s\n", authorizationCode)
 	return authorizationCode, nil
 }
 
@@ -40,9 +43,14 @@ func (s *Service) getValidAuthorizationCode(code, redirectURI string, client *mo
 	}
 
 	// Redirect URI must match if it was used to obtain the authorization code
+	fmt.Printf("################# URI passed in: %s #### URI in DB %s\n", redirectURI, authorizationCode.RedirectURI.String)
+
+	// Ari hack skip the redirect check for now
+	/*
 	if redirectURI != authorizationCode.RedirectURI.String {
 		return nil, ErrInvalidRedirectURI
 	}
+	*/
 
 	// Check the authorization code hasn't expired
 	if time.Now().After(authorizationCode.ExpiresAt) {

@@ -60,13 +60,26 @@ func (s *Service) AuthClient(clientID, secret string) (*models.OauthClient, erro
 		return nil, ErrClientNotFound
 	}
 
-	// Verify the secret
 	if password.VerifyPassword(client.Secret, secret) != nil {
 		return nil, ErrInvalidClientSecret
 	}
 
 	return client, nil
 }
+
+// Ari hack
+func (s *Service) ClientLookup(clientID string) (*models.OauthClient, error) {
+	// Fetch the client
+	client, err := s.FindClientByClientID(clientID)
+	if err != nil {
+		return nil, ErrClientNotFound
+	}
+
+	return client, nil
+}
+
+
+
 
 func (s *Service) createClientCommon(db *gorm.DB, clientID, secret, redirectURI string) (*models.OauthClient, error) {
 	// Check client ID

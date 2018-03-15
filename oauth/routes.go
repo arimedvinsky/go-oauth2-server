@@ -29,7 +29,8 @@ func (s *Service) GetRoutes() []routes.Route {
 		},
 		{
 			Name:        "oauth_introspect",
-			Method:      "POST",
+			// Ari hack changed to GET from POST
+			Method:      "GET",
 			Pattern:     introspectPath,
 			HandlerFunc: s.introspectHandler,
 		},

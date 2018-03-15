@@ -6,6 +6,8 @@ import (
 
 	"github.com/RichardKnop/go-oauth2-server/models"
 	"github.com/RichardKnop/go-oauth2-server/oauth/tokentypes"
+	"strings"
+	"fmt"
 )
 
 const (
@@ -59,6 +61,55 @@ func (s *Service) introspectToken(r *http.Request, client *models.OauthClient) (
 		return nil, ErrTokenHintInvalid
 	}
 }
+
+// Ari Hack
+func (s *Service) introspectTokenDemo(r *http.Request) (*IntrospectResponse, error) {
+
+	fmt.Printf("++++++ Top of Introspection --- \n")
+	auth := r.Header.Get("Authorization")
+	if auth == "" {
+		return nil, ErrTokenMissing
+	}
+
+	const prefix = "Bearer "
+	if !strings.HasPrefix(auth, prefix) {
+		return nil, ErrTokenMissing
+	}
+
+	token := strings.TrimSpace(auth[len(prefix):])
+
+	fmt.Printf("++++++ Introspection --- the original token was %s\n", token)
+
+	if token == "" {
+		return nil, ErrTokenMissing
+	}
+
+
+	// Get token type hint from the query
+	tokenTypeHint := r.Form.Get("token_type_hint")
+
+	// Default to access token hint
+	if tokenTypeHint == "" {
+		tokenTypeHint = AccessTokenHint
+	}
+
+	switch tokenTypeHint {
+	case AccessTokenHint:
+		accessToken, err := s.Authenticate(token)
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Printf("++++++ Introspection --- the original token was %s\n", token)
+		return s.NewIntrospectResponseFromAccessToken(accessToken)
+	default:
+		return nil, ErrTokenHintInvalid
+	}
+}
+
+
+
+
 
 // NewIntrospectResponseFromAccessToken ...
 func (s *Service) NewIntrospectResponseFromAccessToken(accessToken *models.OauthAccessToken) (*IntrospectResponse, error) {

@@ -27,6 +27,14 @@ func (s *Service) GetRoutes() []routes.Route {
 			},
 		},
 		{
+			Name:        "openid_config",
+			Method:      "GET",
+			Pattern:     "/openid-configuration",
+			HandlerFunc: s.getOpenIDConfig,
+			Middlewares: []negroni.Handler{
+			},
+		},
+		{
 			Name:        "register",
 			Method:      "POST",
 			Pattern:     "/register",

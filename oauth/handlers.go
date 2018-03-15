@@ -13,6 +13,7 @@ var (
 	ErrInvalidGrantType = errors.New("Invalid grant type")
 	// ErrInvalidClientIDOrSecret ...
 	ErrInvalidClientIDOrSecret = errors.New("Invalid client ID or secret")
+	ErrInvalidClientID = errors.New("Invalid client ID")
 )
 
 // tokensHandler handles all OAuth 2.0 grant types
@@ -39,11 +40,25 @@ func (s *Service) tokensHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Ari  change to support getting client id directory
+	clientID := r.Form.Get("client_id")
+	if !ok {
+		response.Error(w, ErrInvalidClientID.Error(), http.StatusBadRequest)
+		return
+	}
+
 	// Client auth
+
 	client, err := s.basicAuthClient(r)
 	if err != nil {
-		response.UnauthorizedError(w, err.Error())
-		return
+
+		// Ari hack: for now support both basic auth and placeholder for pkce which is just client id for now
+		client, err = s.PKCE_placeHolder(clientID)
+
+		if (err !=nil) {
+			response.UnauthorizedError(w, err.Error())
+			return
+		}
 	}
 
 	// Grant processing
@@ -61,14 +76,19 @@ func (s *Service) tokensHandler(w http.ResponseWriter, r *http.Request) {
 // (POST /v1/oauth/introspect)
 func (s *Service) introspectHandler(w http.ResponseWriter, r *http.Request) {
 	// Client auth
+
+	//Ari Hack
+
+	/*
 	client, err := s.basicAuthClient(r)
 	if err != nil {
 		response.UnauthorizedError(w, err.Error())
 		return
 	}
+	*/
 
 	// Introspect the token
-	resp, err := s.introspectToken(r, client)
+	resp, err := s.introspectTokenDemo(r)
 	if err != nil {
 		response.Error(w, err.Error(), getErrStatusCode(err))
 		return
@@ -95,3 +115,17 @@ func (s *Service) basicAuthClient(r *http.Request) (*models.OauthClient, error) 
 
 	return client, nil
 }
+
+// Ari hack
+func (s *Service) PKCE_placeHolder(clientID string) (*models.OauthClient, error) {
+
+	// Authenticate the client
+	client, err := s.ClientLookup(clientID)
+	if err != nil {
+		// For security reasons, return a general error message
+		return nil, ErrInvalidClientIDOrSecret
+	}
+
+	return client, nil
+}
+

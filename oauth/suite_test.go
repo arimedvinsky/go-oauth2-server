@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/suite"
+	"fmt"
 )
 
 var (
@@ -51,9 +52,11 @@ type OauthTestSuite struct {
 // start of the testing suite, before any tests are run.
 func (suite *OauthTestSuite) SetupSuite() {
 	// Initialise the config
-	suite.cnf = config.NewConfig(false, false, "etcd")
+	suite.cnf = config.NewConfig(true, false, "consul")
 
 	// Create the test database
+	fmt.Printf("======The database conf %+v", suite.cnf.Database)
+
 	db, err := testutil.CreateTestDatabasePostgres(
 		suite.cnf.Database.Host,
 		testDbUser,
