@@ -38,5 +38,13 @@ type Config struct {
 	Database      DatabaseConfig
 	Oauth         OauthConfig
 	Session       SessionConfig
+	Facebook      FacebookAppAuthConfig
 	IsDevelopment bool
+}
+
+// FacebookAppAuthConfig specifies app id and secret needed for doing Facebook auth
+// Ensure that these secrets match to what Grab-ID has for successful FB token validation from GRAB-ID
+type FacebookAppAuthConfig struct {
+	ApplicationID     string
+	ApplicationSecret string
 }

@@ -16,6 +16,37 @@ func (s *Service) RegisterRoutes(router *mux.Router, prefix string) {
 func (s *Service) GetRoutes() []routes.Route {
 	return []routes.Route{
 		{
+			Name:        "start_fb_login",
+			Method:      "GET",
+			Pattern:     "/dofblogin",
+			HandlerFunc: s.loginWithFacebook,
+			Middlewares: []negroni.Handler{
+				new(parseFormMiddleware),
+				newGuestMiddleware(s),
+				newClientMiddleware(s),
+			},
+		},
+		{
+			Name:        "callback_from_fb",
+			Method:      "GET",
+			Pattern:     "/fbauthcallback",
+			HandlerFunc: s.handleFacebookAuthCallback,
+			Middlewares: []negroni.Handler{
+				newGuestMiddleware(s),
+			},
+		},
+		{
+			Name:        "redirect_to_our_login",
+			Method:      "GET",
+			Pattern:     "/continueFromExtIdpLogin",
+			HandlerFunc: s.continueFromExtIdpLogin,
+			Middlewares: []negroni.Handler{
+				new(parseFormMiddleware),
+				newGuestMiddleware(s),
+				newClientMiddleware(s),
+			},
+		},
+		{
 			Name:        "register_form",
 			Method:      "GET",
 			Pattern:     "/register",

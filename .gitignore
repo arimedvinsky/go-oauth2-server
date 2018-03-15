@@ -3,3 +3,7 @@ go-oauth2-server
 etcd-data
 postgres-data
 coverage*
+default.etcd/member/snap/db
+.DS_Store
+debug
+

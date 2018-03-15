@@ -38,6 +38,10 @@ var Cnf = &Config{
 		MaxAge:   86400 * 7, // 7 days
 		HTTPOnly: true,
 	},
+	Facebook: FacebookAppAuthConfig{
+		ApplicationID:     "843929669120124",
+		ApplicationSecret: "App secret for app id specified above",
+	},
 	IsDevelopment: true,
 }
 

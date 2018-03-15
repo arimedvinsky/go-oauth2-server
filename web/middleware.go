@@ -76,7 +76,13 @@ func (m *loggedInMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request, n
 	if err != nil {
 		query := r.URL.Query()
 		query.Set("login_redirect_uri", r.URL.Path)
-		redirectWithQueryString("/web/login", query, w, r)
+
+		useOldQueryParamVal := query.Get("old")
+		if useOldQueryParamVal == "" {
+			redirectWithQueryString("/web/dofblogin", query, w, r)
+		} else {
+			redirectWithQueryString("/web/login", query, w, r)
+		}
 		return
 	}
 
@@ -84,7 +90,13 @@ func (m *loggedInMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request, n
 	if err := m.authenticate(userSession); err != nil {
 		query := r.URL.Query()
 		query.Set("login_redirect_uri", r.URL.Path)
-		redirectWithQueryString("/web/login", query, w, r)
+
+		useOldQueryParamVal := query.Get("old")
+		if useOldQueryParamVal == "" {
+			redirectWithQueryString("/web/dofblogin", query, w, r)
+		} else {
+			redirectWithQueryString("/web/login", query, w, r)
+		}
 		return
 	}
 
