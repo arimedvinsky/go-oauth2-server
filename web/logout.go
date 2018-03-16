@@ -26,5 +26,12 @@ func (s *Service) logout(w http.ResponseWriter, r *http.Request) {
 	sessionService.ClearUserSession()
 
 	// Redirect back to the login page
+	useOldQueryParamVal := r.URL.Query().Get("old")
+	if useOldQueryParamVal == "" {
+		redirectWithQueryString("/web/dofblogin", r.URL.Query(), w, r)
+	} else {
+		redirectWithQueryString("/web/login", r.URL.Query(), w, r)
+	}
+
 	redirectWithQueryString("/web/login", r.URL.Query(), w, r)
 }
